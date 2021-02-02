@@ -53,8 +53,6 @@ df['description']=""
 coords_list = []
 
 for i in range(len(df['latlon_url'])): 
-    if i % 10 == 0:
-        print('{} of {} urls processed.\r'.format(i, len(df)))
     r2 = requests.get(df['latlon_url'][i]).json()
     df['long'].iloc[i] = r2['items']['long']
     df['lat'].iloc[i] = r2['items']['lat']
