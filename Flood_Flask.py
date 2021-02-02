@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 import json
 import folium
-import time
 
 app = Flask(__name__)
 
@@ -47,7 +46,6 @@ columns = ["id", "county", "status", 'severity_level', "date changed", "latlon_u
 df = df[df['status']!='Warning no longer in force']
 df.reset_index(inplace=True, drop=True)
 
-#df = df.copy()
 df['lat'] = ""
 df['long'] = ""
 df['coords'] =""
@@ -67,8 +65,6 @@ for i in range(len(df['latlon_url'])):
     df['description'].iloc[i] =r3['features'][0]['properties']['DESCRIP']
 
 df['coords'] = coords_list
-ts = time.strftime('%d.%m.%y-%H.%M.%S')
-df['Timestamp'] = ts
 
 @app.route('/')
 def index():
