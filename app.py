@@ -4,11 +4,6 @@ import requests
 import json
 import folium
 
-...
-port = int(os.environ.get('PORT', 5000))
-...
-app.run(host='0.0.0.0', port=port, debug=True)
-
 app = Flask(__name__)
 
 url = 'http://environment.data.gov.uk/flood-monitoring/id/floods'
@@ -80,4 +75,4 @@ def index():
     return m._repr_html_()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=PORT, debug=True) #host='0.0.0.0', port=PORT
