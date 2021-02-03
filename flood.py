@@ -9,46 +9,34 @@ app = Flask(__name__)
 url = 'http://environment.data.gov.uk/flood-monitoring/id/floods'
 r = requests.get(url).json()
 
-flood_area_id_list = []
-county_list = []
 severity_list = []
 time_changed_list = []
 flood_id_list = []
-lat_list = []
-long_list = []
 polygon_url_list = []
-riverorsea_list = []
 severity_level_list = []
 
 for i in range(len(r['items'])):
-    flood_area_id = r['items'][i]['floodAreaID']
-    county = r['items'][i]['floodArea']['county']
     severity = r['items'][i]['severity']
     severity_level = r['items'][i]['severityLevel']
     time_changed = r['items'][i]['timeSeverityChanged']
     flood_id = r['items'][i]['floodArea']['@id']
     polygon_url = r['items'][i]['floodArea']['polygon']
-    riverorsea = r['items'][i]['floodArea']['riverOrSea']
 
-    flood_area_id_list.append(flood_area_id)
-    county_list.append(county)
     severity_list.append(severity)
     severity_level_list.append(severity_level)
     time_changed_list.append(time_changed)
     flood_id_list.append(flood_id)
     polygon_url_list.append(polygon_url)
-    riverorsea_list.append(riverorsea)
 
-df = pd.DataFrame(list(zip(flood_area_id_list, county_list, 
-                severity_list, severity_level_list, time_changed_list, flood_id_list, polygon_url_list, riverorsea_list)),
+df = pd.DataFrame(list(zip( 
+                severity_list, severity_level_list, time_changed_list, flood_id_list, polygon_url_list)),
 columns = ["id", "county", "status", 'severity_level', "date changed", "latlon_url", "polygon_url", "riverorsea"])    
 
-df = df[df['severity_level'] > 2]
+df = df[df['status']== 'Flood alert']
+df = df[df['severity_level']> 2]
 df.reset_index(inplace=True, drop=True)
 
 df2 = df
-df2['lat'] = ""
-df2['long'] = ""
 df2['coords'] =""
 df2['description']=""
 coords_list = []
@@ -56,16 +44,10 @@ coords_list = []
 for i in range(len(df2['latlon_url'])): 
     #if i % 10 == 0:
      #   print('{} of {} urls processed.\r'.format(i, len(df2)))
-    r2 = requests.get(df['latlon_url'].iloc[i]).json()
-    df2['long'].iloc[i] = r2['items']['long']
-    df2['lat'].iloc[i] = r2['items']['lat']
-    
     r3 = requests.get(df2['polygon_url'][i]).json()
     coords = r3['features'][0]['geometry']
     coords_list.append(coords)
     df2['description'].iloc[i] =r3['features'][0]['properties']['DESCRIP']
-
-#df2['coords'] = coords_list
 
 @app.route('/')
 def index():
