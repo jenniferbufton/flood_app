@@ -33,7 +33,6 @@ df = pd.DataFrame(list(zip(
 columns = ["status", 'severity_level', "date changed", "latlon_url", "polygon_url"])    
 
 df = df[df['status']== 'Flood warning']
-df = df[df['severity_level']> 2]
 df.reset_index(inplace=True, drop=True)
 
 df2 = df
