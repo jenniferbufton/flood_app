@@ -36,7 +36,7 @@ df = df[df['status']== 'Flood alert']
 df = df[df['severity_level']> 2]
 df.reset_index(inplace=True, drop=True)
 
-df2 = df
+df2 = df[0:30]
 df2['coords'] =""
 df2['description']=""
 coords_list = []
