@@ -3,6 +3,8 @@ import pandas as pd
 import requests
 import json
 import folium
+import pyproj
+
 
 app = Flask(__name__)
 
@@ -47,6 +49,13 @@ for i in range(len(df2['latlon_url'])):
     coords = r3['features'][0]['geometry']
     coords_list.append(coords)
     df2['description'].iloc[i] =r3['features'][0]['properties']['DESCRIP']
+   
+df_sql = pd.read_excel('FloodRelief.xlsx')
+
+crs_british = pyproj.CRS(init='EPSG:27700')
+crs_wgs84 = pyproj.CRS(init='EPSG:4326')
+
+transformer =  pyproj.transformer.Transformer.from_crs(crs_british, crs_wgs84)
 
 @app.route('/')
 def index():
@@ -56,6 +65,12 @@ def index():
         geo_json = folium.GeoJson(coords_list[i], style_function = lambda x:style_1)
         geo_json.add_child(folium.Popup('Description: {} \n Severity: {}' .format(df2['description'][i], df2['severity_level'][i], df2['date changed'][i])))
         geo_json.add_to(m)
+        
+    for i in range(len(df_sql)):
+    folium.Marker(location=[transformer.transform(df_sql['X'][i], df_sql['Y'][i])[1],
+                            transformer.transform(df_sql['X'][i], df_sql['Y'][i])[0]], 
+    icon=folium.Icon(color='darkpurple'), popup=('Organisation: {}' .format(df_sql['Org Name'][i]))).add_to(m)
+    
     return m._repr_html_()
 
 if __name__ == '__main__':
