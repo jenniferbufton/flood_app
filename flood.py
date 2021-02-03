@@ -30,7 +30,7 @@ for i in range(len(r['items'])):
 
 df = pd.DataFrame(list(zip( 
                 severity_list, severity_level_list, time_changed_list, flood_id_list, polygon_url_list)),
-columns = ["id", "county", "status", 'severity_level', "date changed", "latlon_url", "polygon_url", "riverorsea"])    
+columns = ["status", 'severity_level', "date changed", "latlon_url", "polygon_url"])    
 
 df = df[df['status']== 'Flood alert']
 df = df[df['severity_level']> 2]
