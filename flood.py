@@ -43,10 +43,10 @@ df = pd.DataFrame(list(zip(flood_area_id_list, county_list,
                 severity_list, severity_level_list, time_changed_list, flood_id_list, polygon_url_list, riverorsea_list)),
 columns = ["id", "county", "status", 'severity_level', "date changed", "latlon_url", "polygon_url", "riverorsea"])    
 
-df = df[df['status']!='Warning no longer in force']
+df = df[df['severity_level'] > 2]
 df.reset_index(inplace=True, drop=True)
 
-df2 = df[0:9]
+df2 = df
 df2['lat'] = ""
 df2['long'] = ""
 df2['coords'] =""
@@ -65,7 +65,7 @@ for i in range(len(df2['latlon_url'])):
     coords_list.append(coords)
     df2['description'].iloc[i] =r3['features'][0]['properties']['DESCRIP']
 
-df2['coords'] = coords_list
+#df2['coords'] = coords_list
 
 @app.route('/')
 def index():
