@@ -67,9 +67,9 @@ def index():
         geo_json.add_to(m)
         
     for i in range(len(df_sql)):
-    folium.Marker(location=[transformer.transform(df_sql['X'][i], df_sql['Y'][i])[1],
+        folium.Marker(location=[transformer.transform(df_sql['X'][i], df_sql['Y'][i])[1],
                             transformer.transform(df_sql['X'][i], df_sql['Y'][i])[0]], 
-    icon=folium.Icon(color='darkpurple'), popup=('Organisation: {}' .format(df_sql['Org Name'][i]))).add_to(m)
+                      icon=folium.Icon(color='darkpurple'), popup=('Organisation: {}' .format(df_sql['Org Name'][i]))).add_to(m)
     
     return m._repr_html_()
 
