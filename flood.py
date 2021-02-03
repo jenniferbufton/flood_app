@@ -32,7 +32,7 @@ df = pd.DataFrame(list(zip(
                 severity_list, severity_level_list, time_changed_list, flood_id_list, polygon_url_list)),
 columns = ["status", 'severity_level', "date changed", "latlon_url", "polygon_url"])    
 
-df = df[df['status']== 'Flood alert']
+df = df[df['status']== 'Flood warning']
 df = df[df['severity_level']> 2]
 df.reset_index(inplace=True, drop=True)
 
@@ -55,7 +55,7 @@ def index():
     style_1 = {'fillColor': '#dd1c77',  'color': '#dd1c77', "fillOpacity": 0.5}
     for i in range(len(coords_list)):
         geo_json = folium.GeoJson(coords_list[i], style_function = lambda x:style_1)
-        geo_json.add_child(folium.Popup('Description: {} \n Severity: {}' .format(df2['description'][i], df2['severity_level'][i])))
+        geo_json.add_child(folium.Popup('Description: {} \n Severity: {}' .format(df2['description'][i], df2['severity_level'][i], df2['date changed'][i])))
         geo_json.add_to(m)
     return m._repr_html_()
 
