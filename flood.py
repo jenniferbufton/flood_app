@@ -46,7 +46,7 @@ columns = ["id", "county", "status", 'severity_level', "date changed", "latlon_u
 df = df[df['status']!='Warning no longer in force']
 df.reset_index(inplace=True, drop=True)
 
-df2 = df
+df2 = df[0:9]
 df2['lat'] = ""
 df2['long'] = ""
 df2['coords'] =""
