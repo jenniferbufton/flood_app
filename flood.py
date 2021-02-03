@@ -68,7 +68,7 @@ for i in range(len(df2['latlon_url'])):
 
 df2['coords'] = coords_list
 
-df_sql = pd.read_excel('FloodRelief.xlsx')
+df_sql = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/FloodRelief.csv')
 
 crs_british = pyproj.CRS(init='EPSG:27700')
 crs_wgs84 = pyproj.CRS(init='EPSG:4326')
