@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 import json
 import folium
-import pyproj
 
 app = Flask(__name__)
 
@@ -68,25 +67,30 @@ for i in range(len(df2['latlon_url'])):
 
 df2['coords'] = coords_list
 
-df_sql = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/FloodRelief.csv')
-
-crs_british = pyproj.CRS(init='EPSG:27700')
-crs_wgs84 = pyproj.CRS(init='EPSG:4326')
-
-transformer =  pyproj.transformer.Transformer.from_crs(crs_british, crs_wgs84)
-
 @app.route('/')
+def index():
 def index():
     m = folium.Map(location=[51.509865,-0.118092], zoom_start='6')
     style_1 = {'fillColor': '#dd1c77',  'color': '#dd1c77', "fillOpacity": 0.5}
+    
+    for i in range(len(df_360)):
+        folium.Circle(
+          location=[df_360['Beneficiary Location:0:Latitude'][i],
+                    df_360['Beneficiary Location:0:Longitude'][i]],
+          popup=('Organisation: {} \n Amount: £{:,}' .format(df_360['Recipient Org:Name'].iloc[i], 
+                                                          df_360['Amount Awarded'].iloc[i])),
+          radius=df_360['Amount Awarded'].astype('float')[i]/2,
+          color='navy',
+          fill=True,
+          fill_color='navy',
+        opacity=0.2,
+        fill_opacity=0.5,
+        ).add_to(m)
+
     for i in range(len(coords_list)):
         geo_json = folium.GeoJson(coords_list[i], style_function = lambda x:style_1)
         geo_json.add_child(folium.Popup('Description: {} \n Severity: {}' .format(df2['description'][i], df2['severity_level'][i])))
         geo_json.add_to(m)
-    for i in range(len(df_sql)):
-        folium.Marker(location=[transformer.transform(df_sql['X'][i], df_sql['Y'][i])[1],
-                            transformer.transform(df_sql['X'][i], df_sql['Y'][i])[0]], 
-    icon=folium.Icon(color='darkpurple'), popup=('Organisation: {}' .format(df_sql['Org Name'][i]))).add_to(m)
     return m._repr_html_()
 
 if __name__ == '__main__':
