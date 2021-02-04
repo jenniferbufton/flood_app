@@ -67,8 +67,9 @@ for i in range(len(df2['latlon_url'])):
 
 df2['coords'] = coords_list
 
+df_360 = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/360Giving_flood_20210204.csv')
+
 @app.route('/')
-def index():
 def index():
     m = folium.Map(location=[51.509865,-0.118092], zoom_start='6')
     style_1 = {'fillColor': '#dd1c77',  'color': '#dd1c77', "fillOpacity": 0.5}
@@ -91,6 +92,7 @@ def index():
         geo_json = folium.GeoJson(coords_list[i], style_function = lambda x:style_1)
         geo_json.add_child(folium.Popup('Description: {} \n Severity: {}' .format(df2['description'][i], df2['severity_level'][i])))
         geo_json.add_to(m)
+    
     return m._repr_html_()
 
 if __name__ == '__main__':
