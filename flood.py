@@ -78,8 +78,8 @@ def index():
     ap = requests.get('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/AP.json').json()
     
     for row in range(len(ap['features'])):
-    ap_json = folium.GeoJson(data=(ap['features'][row]['geometry']), style_function = lambda x:style_0).add_to(m)
-    ap_json.add_child(folium.Popup(ap['features'][row]['properties']['Label']))
+        ap_json = folium.GeoJson(data=(ap['features'][row]['geometry']), style_function = lambda x:style_0).add_to(m)
+        ap_json.add_child(folium.Popup(ap['features'][row]['properties']['Label']))
     
     for i in range(len(df_360)):
         folium.Circle(
