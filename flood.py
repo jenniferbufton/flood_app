@@ -80,7 +80,7 @@ def index():
                     df_360['Beneficiary Location:0:Longitude'][i]],
           popup=('Organisation: {} \n Amount: £{:,}' .format(df_360['Recipient Org:Name'].iloc[i], 
                                                           df_360['Amount Awarded'].iloc[i])),
-          radius=df_360['Amount Awarded'].astype('float')[i]/2,
+          radius=df_360['Amount Awarded'].astype('float')[i]/10,
           color='navy',
           fill=True,
           fill_color='navy',
