@@ -72,7 +72,14 @@ df_360 = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app
 @app.route('/')
 def index():
     m = folium.Map(location=[51.509865,-0.118092], zoom_start='6')
+    style_0 = {'fillColor': '#2ca25f',  'color': '#2ca25f', "fillOpacity": 0.1}
     style_1 = {'fillColor': '#dd1c77',  'color': '#dd1c77', "fillOpacity": 0.5}
+    
+    ap = requests.get('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/AP.json').json()
+    
+    for row in range(len(ap['features'])):
+    ap_json = folium.GeoJson(data=(ap['features'][row]['geometry']), style_function = lambda x:style_0).add_to(m)
+    ap_json.add_child(folium.Popup(ap['features'][row]['properties']['Label']))
     
     for i in range(len(df_360)):
         folium.Circle(
