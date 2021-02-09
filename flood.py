@@ -86,6 +86,8 @@ print('=> Constructed OS Maps ZXY API path: {}'.format(zxy_path))
 def index():
     date = datetime.now()
 
+    df_360['Award Date'] = pd.to_datetime(df_360['Award Date'])
+
     m = folium.Map(location=[51.509865,-0.118092],
                min_zoom=7, 
                max_zoom=16)
@@ -101,7 +103,7 @@ def index():
     tile2 = folium.TileLayer(
         tiles = zxy_path,
         attr = 'Contains OS data © Crown copyright and database right {}'.format(date.year),
-        name = 'OS',
+        name = 'OS Outdoor 3857',
         overlay = False,
         control = True
        ).add_to(m)
@@ -114,10 +116,10 @@ def index():
     fg = folium.FeatureGroup(name='Active Partnership', show=True)
     m.add_child(fg)
     
-    point = folium.FeatureGroup(name='Flood Relief funding', show=True)
+    point = folium.FeatureGroup(name='Previous Flood Relief Investment', show=True)
     m.add_child(point)
 
-    flood = folium.FeatureGroup(name='Flooded area', show=True)
+    flood = folium.FeatureGroup(name='Flooded Area', show=True)
     m.add_child(flood)
     
     marker_cluster = MarkerCluster().add_to(point)
@@ -133,7 +135,7 @@ def index():
           location=[df_360['Beneficiary Location:0:Latitude'][i],
                     df_360['Beneficiary Location:0:Longitude'][i]],
           popup=('Organisation: {} \n Amount: £{:,} \n Award date: {} \n URN: {}' .format(df_360['Recipient Org:Name'].iloc[i], 
-                                                          df_360['Amount Awarded'].iloc[i], df_360['Award Date'][i],
+                                                          df_360['Amount Awarded'].iloc[i], df_360['Award Date'][i].strftime("%d/%m/%Y"),
                                                             df_360['URN'][i])),
           radius= 100, #df_360['Amount Awarded'].astype('float')[i]/10,
           color='#2b8cbe',
