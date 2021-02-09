@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import json
 import folium
+from folium.plugins import MarkerCluster
 
 app = Flask(__name__)
 
@@ -72,33 +73,57 @@ df_360 = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app
 @app.route('/')
 def index():
     m = folium.Map(location=[51.509865,-0.118092], zoom_start='6')
-    style_0 = {'fillColor': '#2ca25f',  'color': '#2ca25f', "fillOpacity": 0.1}
+    
+    tile = folium.TileLayer(
+        tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        attr = 'Esri',
+        name = 'Esri Satellite',
+        overlay = False,
+        control = True
+       ).add_to(m)
+    folium.TileLayer('Stamen Terrain').add_to(m)
+    
+    style_0 = {'fillColor': '#2ca25f',  'color': '#2ca25f', "fillOpacity": 0.1, "weight": 1.7}
     style_1 = {'fillColor': '#dd1c77',  'color': '#dd1c77', "fillOpacity": 0.5}
+    
+    fg = folium.FeatureGroup(name='Active Partnership', show=True)
+    m.add_child(fg)
+    
+    point = folium.FeatureGroup(name='Grants', show=True)
+    m.add_child(point)
+
+    flood = folium.FeatureGroup(name='Flooded area', show=True)
+    m.add_child(flood)
+    
+    marker_cluster = MarkerCluster().add_to(point)
     
     ap = requests.get('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/AP.json').json()
     
     for row in range(len(ap['features'])):
-        ap_json = folium.GeoJson(data=(ap['features'][row]['geometry']), style_function = lambda x:style_0).add_to(m)
+        ap_json = folium.GeoJson(data=(ap['features'][row]['geometry']), style_function = lambda x:style_0).add_to(fg)
         ap_json.add_child(folium.Popup(ap['features'][row]['properties']['Label']))
     
     for i in range(len(df_360)):
         folium.Circle(
           location=[df_360['Beneficiary Location:0:Latitude'][i],
                     df_360['Beneficiary Location:0:Longitude'][i]],
-          popup=('Organisation: {} \n Amount: £{:,}' .format(df_360['Recipient Org:Name'].iloc[i], 
-                                                          df_360['Amount Awarded'].iloc[i])),
+          popup=('Organisation: {} \n Amount: £{:,} \n Award date: {} \n URN: {}' .format(df_360['Recipient Org:Name'].iloc[i], 
+                                                          df_360['Amount Awarded'].iloc[i], df_360['Award Date'][i],
+                                                            df_360['URN'][i])),
           radius=df_360['Amount Awarded'].astype('float')[i]/10,
-          color='navy',
+          color='#2b8cbe'
           fill=True,
-          fill_color='navy',
-        opacity=0.2,
+          fill_color='#2b8cbe'
+        opacity=0.8
         fill_opacity=0.5,
-        ).add_to(m)
+        ).add_to(marker_cluster)
 
     for i in range(len(coords_list)):
         geo_json = folium.GeoJson(coords_list[i], style_function = lambda x:style_1)
-        geo_json.add_child(folium.Popup('Description: {} \n Severity: {}' .format(df2['description'][i], df2['severity_level'][i])))
-        geo_json.add_to(m)
+        geo_json.add_child( folium.Popup('Flood warning: {} \n Severity: {}' .format(df['description'][i], df['severity_level'][i])))
+        geo_json.add_to(flood)
+     
+    folium.LayerControl(collapsed = False).add_to(m)
     
     return m._repr_html_()
 
