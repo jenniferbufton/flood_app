@@ -47,7 +47,7 @@ df = pd.DataFrame(list(zip(flood_area_id_list, county_list,
                 severity_list, severity_level_list, time_changed_list, flood_id_list, polygon_url_list, riverorsea_list)),
 columns = ["id", "county", "status", 'severity_level', "date changed", "latlon_url", "polygon_url", "riverorsea"])    
 
-df = df[df['status']!='Flood warning']
+df = df[df['status'] =='Flood warning']
 df.reset_index(inplace=True, drop=True)
 
 df = df.copy()
