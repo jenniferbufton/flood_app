@@ -9,6 +9,8 @@ import os
 
 app = Flask(__name__)
 
+key = os.environ.get("api_key")
+
 url = 'http://environment.data.gov.uk/flood-monitoring/id/floods'
 r = requests.get(url).json()
 
@@ -75,9 +77,8 @@ df['coords'] = coords_list
 
 df_360 = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/360Giving_flood_20210204.csv')
 
-api_key = os.getenv("api_key")
 layer = 'Outdoor_3857'
-zxy_path = 'https://api.os.uk/maps/raster/v1/zxy/{}/{{z}}/{{x}}/{{y}}.png?key={}'.format(layer, api_key)
+zxy_path = 'https://api.os.uk/maps/raster/v1/zxy/{}/{{z}}/{{x}}/{{y}}.png?key={}'.format(layer, key)
 
 print('=> Constructed OS Maps ZXY API path: {}'.format(zxy_path))
 
