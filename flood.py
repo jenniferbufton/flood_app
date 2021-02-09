@@ -89,7 +89,7 @@ def index():
     fg = folium.FeatureGroup(name='Active Partnership', show=True)
     m.add_child(fg)
     
-    point = folium.FeatureGroup(name='Grants', show=True)
+    point = folium.FeatureGroup(name='Flood Relief Funding', show=True)
     m.add_child(point)
 
     flood = folium.FeatureGroup(name='Flooded area', show=True)
