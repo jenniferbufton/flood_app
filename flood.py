@@ -4,6 +4,9 @@ import requests
 import json
 import folium
 from folium.plugins import MarkerCluster
+from datetime import datetime
+import config
+import fiona
 
 app = Flask(__name__)
 
@@ -44,34 +47,45 @@ df = pd.DataFrame(list(zip(flood_area_id_list, county_list,
                 severity_list, severity_level_list, time_changed_list, flood_id_list, polygon_url_list, riverorsea_list)),
 columns = ["id", "county", "status", 'severity_level', "date changed", "latlon_url", "polygon_url", "riverorsea"])    
 
-df = df[df['status']!='Warning no longer in force']
+df = df[df['status']!='Flood warning']
 df.reset_index(inplace=True, drop=True)
 
-df2 = df[0:10]
-df2['lat'] = ""
-df2['long'] = ""
-df2['coords'] =""
-df2['description']=""
+df = df.copy()
+df['lat'] = ""
+df['long'] = ""
+df['coords'] =""
+df['description']=""
+df['CTY19NM'] = ""
+df['coords']
 coords_list = []
 
-for i in range(len(df2['latlon_url'])): 
-    #if i % 10 == 0:
-     #   print('{} of {} urls processed.\r'.format(i, len(df2)))
+for i in range(len(df['latlon_url'])): 
+    if i % 10 == 0:
+        print('{} of {} urls processed.\r'.format(i, len(df)))
     r2 = requests.get(df['latlon_url'].iloc[i]).json()
-    df2['long'].iloc[i] = r2['items']['long']
-    df2['lat'].iloc[i] = r2['items']['lat']
+    df['long'].iloc[i] = r2['items']['long']
+    df['lat'].iloc[i] = r2['items']['lat']
     
-    r3 = requests.get(df2['polygon_url'].iloc[i]).json()
+    r3 = requests.get(df['polygon_url'].iloc[i]).json()
     coords = r3['features'][0]['geometry']
     coords_list.append(coords)
-    df2['description'].iloc[i] =r3['features'][0]['properties']['DESCRIP']
-
-df2['coords'] = coords_list
+    df['description'].iloc[i] =r3['features'][0]['properties']['DESCRIP']
+    df['CTY19NM'].iloc[i] = r3['features'][0]['properties']['LA_NAME']
+    
+df['coords'] = coords_list
 
 df_360 = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/360Giving_flood_20210204.csv')
 
+key = config.api_key
+layer = 'Outdoor_3857'
+zxy_path = 'https://api.os.uk/maps/raster/v1/zxy/{}/{{z}}/{{x}}/{{y}}.png?key={}'.format(layer, key)
+
+print('=> Constructed OS Maps ZXY API path: {}'.format(zxy_path))
+
 @app.route('/')
 def index():
+    date = datetime.now()
+
     m = folium.Map(location=[51.509865,-0.118092], zoom_start='6')
     
     tile = folium.TileLayer(
@@ -81,6 +95,15 @@ def index():
         overlay = False,
         control = True
        ).add_to(m)
+
+    tile2 = folium.TileLayer(
+        tiles = zxy_path,
+        attr = 'Contains OS data © Crown copyright and database right {}'.format(date.year),
+        name = 'OS',
+        overlay = False,
+        control = True
+       ).add_to(m)
+
     folium.TileLayer('Stamen Terrain').add_to(m)
     
     style_0 = {'fillColor': '#2ca25f',  'color': '#2ca25f', "fillOpacity": 0.1, "weight": 1.7}
@@ -111,10 +134,10 @@ def index():
                                                           df_360['Amount Awarded'].iloc[i], df_360['Award Date'][i],
                                                             df_360['URN'][i])),
           radius= 100, #df_360['Amount Awarded'].astype('float')[i]/10,
-          color='#2b8cbe'
+          color='#2b8cbe',
           fill=True,
-          fill_color='#2b8cbe'
-        opacity=0.8
+          fill_color='#2b8cbe',
+        opacity=0.8,
         fill_opacity=0.7,
         ).add_to(marker_cluster)
 
