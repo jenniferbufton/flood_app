@@ -86,7 +86,10 @@ print('=> Constructed OS Maps ZXY API path: {}'.format(zxy_path))
 def index():
     date = datetime.now()
 
-    m = folium.Map(location=[51.509865,-0.118092], zoom_start='6')
+    m = folium.Map(location=[51.509865,-0.118092],
+               min_zoom=7, 
+               max_zoom=16,
+               zoom_start='8')
     
     tile = folium.TileLayer(
         tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
