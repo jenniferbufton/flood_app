@@ -110,12 +110,12 @@ def index():
           popup=('Organisation: {} \n Amount: £{:,} \n Award date: {} \n URN: {}' .format(df_360['Recipient Org:Name'].iloc[i], 
                                                           df_360['Amount Awarded'].iloc[i], df_360['Award Date'][i],
                                                             df_360['URN'][i])),
-          radius=df_360['Amount Awarded'].astype('float')[i]/10,
+          radius= 100, #df_360['Amount Awarded'].astype('float')[i]/10,
           color='#2b8cbe'
           fill=True,
           fill_color='#2b8cbe'
         opacity=0.8
-        fill_opacity=0.5,
+        fill_opacity=0.7,
         ).add_to(marker_cluster)
 
     for i in range(len(coords_list)):
