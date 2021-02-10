@@ -7,4 +7,5 @@ Also available as layers:
 
 
 
-![OS data © Crown copyright and database right 2021](https://github.com/jenniferbufton/flood_app/blob/main/img.JPG)
+![](https://github.com/jenniferbufton/flood_app/blob/main/img.JPG)
+OS data © Crown copyright and database right 2021
