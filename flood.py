@@ -48,7 +48,7 @@ df = pd.DataFrame(list(zip(flood_area_id_list, county_list,
                 severity_list, severity_level_list, time_changed_list, flood_id_list, polygon_url_list, riverorsea_list)),
 columns = ["id", "county", "status", 'severity_level', "date changed", "latlon_url", "polygon_url", "riverorsea"])    
 
-df = df[df['status'] =='Flood warning']
+df = df[df['status']!= 'Flood alert']
 df.reset_index(inplace=True, drop=True)
 
 df = df.copy()
@@ -87,6 +87,7 @@ def index():
     date = datetime.now()
 
     df_360['Award Date'] = pd.to_datetime(df_360['Award Date'])
+    df['date changed'] = pd.to_datetime(df['date changed'])
 
     m = folium.Map(location=[51.509865,-0.118092],
                min_zoom=7, 
@@ -112,15 +113,19 @@ def index():
     
     style_0 = {'fillColor': '#2ca25f',  'color': '#2ca25f', "fillOpacity": 0.1, "weight": 1.7}
     style_1 = {'fillColor': '#dd1c77',  'color': '#dd1c77', "fillOpacity": 0.5}
+    style_2 = {'fillColor': '#bdbdbd',  'color': '#636363', "fillOpacity": 0.5}
     
     fg = folium.FeatureGroup(name='Active Partnership', show=True)
     m.add_child(fg)
     
-    point = folium.FeatureGroup(name='Previous Flood Relief Investment', show=True)
+    point = folium.FeatureGroup(name='Previous Flood Relief investment', show=True)
     m.add_child(point)
 
-    flood = folium.FeatureGroup(name='Flooded Area', show=True)
+    flood = folium.FeatureGroup(name='Flooded area', show=True)
     m.add_child(flood)
+
+    flood_no = folium.FeatureGroup(name='Warning no longer active', show=True)
+    m.add_child(flood_no)
     
     marker_cluster = MarkerCluster().add_to(point)
     
@@ -145,10 +150,23 @@ def index():
         fill_opacity=0.7,
         ).add_to(marker_cluster)
 
-    for i in range(len(coords_list)):
-        geo_json = folium.GeoJson(coords_list[i], style_function = lambda x:style_1)
-        geo_json.add_child( folium.Popup('Flood warning: {} \n Severity: {}' .format(df['description'][i], df['severity_level'][i])))
+    warning_df = df[df['status']=='Flood warning']
+    warning_df.reset_index(inplace=True, drop=True)
+
+    no_df = df[df['status']!='Flood warning']
+    no_df.reset_index(inplace=True, drop=True)
+    
+    for i in range(len(warning_df)):
+        geo_json = folium.GeoJson(warning_df['coords'][i], style_function = lambda x:style_1)
+        geo_json.add_child( folium.Popup('Status: {} \n Description: {} \n Severity: {}' .format(warning_df['status'][i],
+        warning_df['description'][i], warning_df['severity_level'][i])))
         geo_json.add_to(flood)
+
+    for i in range(len(no_df)):
+        geo_json2 = folium.GeoJson(no_df['coords'][i], style_function = lambda x:style_2)
+        geo_json2.add_child( folium.Popup('Status: {} \n Description: {} \n Severity: {} \n Date changed: {}' .format(no_df['status'][i],
+        no_df['description'][i], no_df['severity_level'][i], no_df['date changed'][i].strftime("%d/%m/%Y"))))
+        geo_json2.add_to(flood_no)
      
     folium.LayerControl(collapsed = False).add_to(m)
     
