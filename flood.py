@@ -57,8 +57,6 @@ df['long'] = ""
 df['coords'] =""
 df['description']=""
 df['CTY19NM'] = ""
-df['coords']
-coords_list = []
 
 for i in range(len(df['latlon_url'])): 
     if i % 10 == 0:
@@ -68,12 +66,16 @@ for i in range(len(df['latlon_url'])):
     df['lat'].iloc[i] = r2['items']['lat']
     
     r3 = requests.get(df['polygon_url'].iloc[i]).json()
-    coords = r3['features'][0]['geometry']
-    coords_list.append(coords)
     df['description'].iloc[i] =r3['features'][0]['properties']['DESCRIP']
     df['CTY19NM'].iloc[i] = r3['features'][0]['properties']['LA_NAME']
     
-df['coords'] = coords_list
+def get_coord(x):
+    r3 = requests.get(x).json()
+    coords = r3['features'][0]['geometry']
+    return coords
+
+coords_list = map(get_coord, df['polygon_url'])
+df['coords'] = list(coords_list) 
 
 df_360 = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/360Giving_flood_20210204.csv')
 
@@ -88,10 +90,15 @@ def index():
 
     df_360['Award Date'] = pd.to_datetime(df_360['Award Date'])
     df['date changed'] = pd.to_datetime(df['date changed'])
+    
+    flood_df = df[df['status']=='Flood warning']
+    flood_df = flood_df.sort_values('severity_level', ascending=False)
+    flood_df.reset_index(inplace=True)
 
-    m = folium.Map(location=[51.509865,-0.118092],
+    m = folium.Map(location=[flood_df['lat'][1],flood_df['long'][1]],
                min_zoom=7, 
-               max_zoom=16)
+               max_zoom=16,
+               zoom_start=9 )
     
     tile = folium.TileLayer(
         tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -113,7 +120,7 @@ def index():
     
     style_0 = {'fillColor': '#2ca25f',  'color': '#2ca25f', "fillOpacity": 0.1, "weight": 1.7}
     style_1 = {'fillColor': '#dd1c77',  'color': '#dd1c77', "fillOpacity": 0.5}
-    style_2 = {'fillColor': '#bdbdbd',  'color': '#636363', "fillOpacity": 0.5}
+    style_2 = {'fillColor': '#bdbdbd',  'color': '#756bb1', "fillOpacity": 0.5}
     
     fg = folium.FeatureGroup(name='Active Partnership', show=True)
     m.add_child(fg)
