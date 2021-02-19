@@ -149,7 +149,7 @@ def index():
           popup=('Organisation: {} \n Amount: £{:,} \n Award date: {} \n URN: {}' .format(df_360['Recipient Org:Name'].iloc[i], 
                                                           df_360['Amount Awarded'].iloc[i], df_360['Award Date'][i].strftime("%d/%m/%Y"),
                                                             df_360['URN'][i])),
-          radius= 100, #df_360['Amount Awarded'].astype('float')[i]/10,
+          radius= 200, #df_360['Amount Awarded'].astype('float')[i]/10,
           color='#2b8cbe',
           fill=True,
           fill_color='#2b8cbe',
