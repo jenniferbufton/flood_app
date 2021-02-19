@@ -77,7 +77,7 @@ def get_coord(x):
 coords_list = map(get_coord, df['polygon_url'])
 df['coords'] = list(coords_list) 
 
-df_360 = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/360Giving_flood_20210204.csv')
+df_360 = pd.read_csv('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/data/360Giving_flood_20210204.csv')
 
 layer = 'Outdoor_3857'
 zxy_path = 'https://api.os.uk/maps/raster/v1/zxy/{}/{{z}}/{{x}}/{{y}}.png?key={}'.format(layer, key)
@@ -136,7 +136,7 @@ def index():
     
     marker_cluster = MarkerCluster().add_to(point)
     
-    ap = requests.get('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/AP.json').json()
+    ap = requests.get('https://raw.githubusercontent.com/jenniferbufton/flood_app/main/data/AP.json').json()
     
     for row in range(len(ap['features'])):
         ap_json = folium.GeoJson(data=(ap['features'][row]['geometry']), style_function = lambda x:style_0).add_to(fg)
