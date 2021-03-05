@@ -95,10 +95,10 @@ def index():
     flood_df = flood_df.sort_values('severity_level', ascending=False)
     flood_df.reset_index(inplace=True)
 
-    m = folium.Map(location=[flood_df['lat'][1],flood_df['long'][1]],
+    m = folium.Map(location=[52.489471, -1.898575],
                min_zoom=7, 
                max_zoom=16,
-               zoom_start=9 )
+               zoom_start=7 )
     
     tile = folium.TileLayer(
         tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
